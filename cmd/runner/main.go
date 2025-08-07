@@ -6,6 +6,7 @@ import (
 	"os"
 
 	_ "github.com/prbllm/go-kata/internal/actionpurpose"
+	_ "github.com/prbllm/go-kata/internal/route"
 	"github.com/prbllm/go-kata/internal/task"
 )
 

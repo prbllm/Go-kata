@@ -1,4 +1,4 @@
-package actionpurpose
+package route
 
 import (
 	"bufio"
@@ -12,7 +12,7 @@ import (
 type Task struct{}
 
 func (Task) Name() string {
-	return "actionpurpose"
+	return "route"
 }
 
 func (Task) Run() error {
@@ -22,21 +22,23 @@ func (Task) Run() error {
 	out = bufio.NewWriter(os.Stdout)
 	defer out.Flush()
 
-	parser := NewActionPurposeParser()
-	var testsCount, rowCount int
+	var testsCount, rowCount, colCount int
 	fmt.Fscan(in, &testsCount)
 	in.ReadString('\n')
-
-	result := make([]string, 0)
 
 	for i := 0; i < testsCount; i++ {
 		fmt.Fscan(in, &rowCount)
 		in.ReadString('\n')
 
+		fmt.Fscan(in, &colCount)
+		in.ReadString('\n')
+
+		navigator := NewNavigator(rowCount, colCount)
+
 		for j := 0; j < rowCount; j++ {
 			line, _ := in.ReadString('\n')
 			line = strings.TrimRight(line, "\r\n")
-			err := parser.ParseLine(line)
+			err := navigator.ParseLine(line, j)
 
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "parse:", err)
@@ -48,15 +50,10 @@ func (Task) Run() error {
 			}
 		}
 
-		results := parser.GetResult()
+		results := navigator.GetResult()
 		for _, resultLine := range results {
-			result = append(result, resultLine+" is "+parser.lastAction+".")
+			fmt.Fprintln(out, resultLine)
 		}
-		parser.CleanData()
-	}
-
-	for _, resultLine := range result {
-		fmt.Fprintln(out, resultLine)
 	}
 	return nil
 }
